@@ -7,6 +7,11 @@ Struct convert to map[string]interface{} parser
 ```
 // definition struct
 type Date time.Time
+
+func (date Date) Convert() interface{} {
+	return time.Time(date)
+}
+
 type CreateArticleRequest struct {
 	ArticleNumber     int    `query:"articleNumber" search:"article_number,omitempty"`
 	Title             string `query:"title" search:"title,omitempty"`
@@ -37,9 +42,6 @@ map[string]interface{
 
 // can specified fields convert to other type
 now := time.Now()
-castMap := map[reflect.Type]reflect.Type{
-    reflect.TypeOf(Date{}): reflect.TypeOf(time.Time{}),
-}
 req := &CreateArticleRequest{
 	ArticleNumber       : 1, 
 	Title               : "test",
@@ -49,7 +51,7 @@ req := &CreateArticleRequest{
 }
 
 objectParser := NewObjectParser()
-tagValueMap := objectParser.TagValueMap("search", castMap)
+tagValueMap := objectParser.TagValueMap("search")
 
 // tagValueMap
 map[string]interface{
