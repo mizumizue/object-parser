@@ -23,7 +23,8 @@ func NewObjectParser(object interface{}) *ObjectParser {
 // 1. field wasn't granted target tag
 // 2. field is ptr & nil
 // 3. target tag contains omitempty & field is zero value
-func (objectParser *ObjectParser) TagValueMap(targetTag string, castMap ...map[reflect.Type]reflect.Type) map[string]interface{} {
+// if field type implements interface `Convert() interface{}` by value receiver, Auto convert field type to other type
+func (objectParser *ObjectParser) TagValueMap(targetTag string) map[string]interface{} {
 	namedParam := make(map[string]interface{})
 	t, v := objectParser.getTypeAndValue()
 
@@ -45,13 +46,11 @@ func (objectParser *ObjectParser) TagValueMap(targetTag string, castMap ...map[r
 			continue
 		}
 
-		fieldValueType := fieldValue.Type()
-		if len(castMap) > 0 && castMap[0][fieldValueType] != nil {
-			namedParam[tagValues[0]] = fieldValue.Convert(castMap[0][fieldValueType]).Interface()
-			continue
+		if cast, ok := fieldValue.Interface().(interface{ Convert() interface{} }); ok {
+			namedParam[tagValues[0]] = cast.Convert()
+		} else {
+			namedParam[tagValues[0]] = fieldValue.Interface()
 		}
-
-		namedParam[tagValues[0]] = fieldValue.Interface()
 	}
 	return namedParam
 }

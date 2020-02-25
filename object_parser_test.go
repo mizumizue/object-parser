@@ -20,6 +20,10 @@ func allocateDate(value Date) *Date {
 
 type Date time.Time
 
+func (date Date) Convert() interface{} {
+	return time.Time(date)
+}
+
 type CreateArticleRequest struct {
 	ArticleNumber     int    `query:"articleNumber" search:"article_number,omitempty"`
 	Title             string `query:"title" search:"title,omitempty"`
@@ -44,11 +48,41 @@ type CreateArticleRequestFieldPtr struct {
 	PublishedDateTo   *Date   `query:"publishedDateTo" search:"published_date_to"`
 }
 
+func TestNewObjectParser(t *testing.T) {
+	type Hoge struct {
+		hoge string
+		foo  string
+		bar  string
+	}
+	type args struct {
+		object interface{}
+	}
+	tests := []struct {
+		name string
+		args args
+		want *ObjectParser
+	}{
+		{
+			name: "",
+			args: args{object: Hoge{}},
+			want: &ObjectParser{
+				Hoge{},
+				reflect.TypeOf(Hoge{}),
+				reflect.ValueOf(Hoge{}),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewObjectParser(tt.args.object); reflect.TypeOf(got.object) != reflect.TypeOf(tt.want.object) || got.objectType != tt.want.objectType || got.objectValue.Interface() != tt.want.objectValue.Interface() {
+				t.Errorf("NewObjectParser() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestObjectParser_NamedParam(t *testing.T) {
 	now := time.Now()
-	castMap := map[reflect.Type]reflect.Type{
-		reflect.TypeOf(Date{}): reflect.TypeOf(time.Time{}),
-	}
 
 	test1 := CreateArticleRequest{
 		ArticleNumber:     1,
@@ -87,7 +121,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 	}
 	type args struct {
 		targetTag string
-		castMap   map[reflect.Type]reflect.Type
 	}
 
 	tests := []struct {
@@ -105,7 +138,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{
 				"article_number":      1,
@@ -124,7 +156,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{},
 		},
@@ -137,7 +168,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{
 				"article_number":      1,
@@ -156,7 +186,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{
 				"article_number":      0,
@@ -175,7 +204,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{
 				"article_number":      1,
@@ -194,7 +222,6 @@ func TestObjectParser_NamedParam(t *testing.T) {
 			},
 			args: args{
 				targetTag: "search",
-				castMap:   castMap,
 			},
 			want: map[string]interface{}{},
 		},
@@ -206,7 +233,7 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				objectType:  tt.fields.objectType,
 				objectValue: tt.fields.objectValue,
 			}
-			if got := objectParser.TagValueMap(tt.args.targetTag, tt.args.castMap); !reflect.DeepEqual(got, tt.want) {
+			if got := objectParser.TagValueMap(tt.args.targetTag); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf(
 					"\nObjectParser.TagValueMap() = %v "+
 						"\n                     want = %v", got, tt.want,
