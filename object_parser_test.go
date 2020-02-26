@@ -54,6 +54,16 @@ func TestNewObjectParser(t *testing.T) {
 		foo  string
 		bar  string
 	}
+
+	now := time.Now()
+	req := CreateArticleRequest{
+		ArticleNumber:     1,
+		Title:             "test-title",
+		AuthorID:          "test-author",
+		PublishedDateFrom: Date(now),
+		PublishedDateTo:   Date(now),
+	}
+
 	type args struct {
 		object interface{}
 	}
@@ -66,9 +76,18 @@ func TestNewObjectParser(t *testing.T) {
 			name: "",
 			args: args{object: Hoge{}},
 			want: &ObjectParser{
-				Hoge{},
-				reflect.TypeOf(Hoge{}),
-				reflect.ValueOf(Hoge{}),
+				object:      Hoge{},
+				objectType:  reflect.TypeOf(Hoge{}),
+				objectValue: reflect.ValueOf(Hoge{}),
+			},
+		},
+		{
+			name: "",
+			args: args{object: req},
+			want: &ObjectParser{
+				object:      req,
+				objectType:  reflect.TypeOf(req),
+				objectValue: reflect.ValueOf(req),
 			},
 		},
 	}
@@ -115,9 +134,10 @@ func TestObjectParser_NamedParam(t *testing.T) {
 	test6 := CreateArticleRequestFieldPtr{}
 
 	type fields struct {
-		object      interface{}
-		objectType  reflect.Type
-		objectValue reflect.Value
+		object          interface{}
+		objectType      reflect.Type
+		objectValue     reflect.Value
+		objectFieldTags map[FieldName]*FieldTag
 	}
 	type args struct {
 		targetTag string
@@ -135,6 +155,83 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test1,
 				objectType:  reflect.TypeOf(test1),
 				objectValue: reflect.ValueOf(test1),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+									"omitempty",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
@@ -153,6 +250,83 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test2,
 				objectType:  reflect.TypeOf(test2),
 				objectValue: reflect.ValueOf(test2),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+									"omitempty",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
@@ -165,6 +339,78 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test3,
 				objectType:  reflect.TypeOf(test3),
 				objectValue: reflect.ValueOf(test3),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
@@ -183,6 +429,78 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test4,
 				objectType:  reflect.TypeOf(test4),
 				objectValue: reflect.ValueOf(test4),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
@@ -201,6 +519,83 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test5,
 				objectType:  reflect.TypeOf(test5),
 				objectValue: reflect.ValueOf(test5),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+									"omitempty",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
@@ -219,19 +614,109 @@ func TestObjectParser_NamedParam(t *testing.T) {
 				object:      test6,
 				objectType:  reflect.TypeOf(test6),
 				objectValue: reflect.ValueOf(test6),
+				objectFieldTags: map[FieldName]*FieldTag{
+					FieldName("ArticleNumber"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"articleNumber",
+								},
+							},
+							"search": {
+								[]string{
+									"article_number",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("Title"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"title",
+								},
+							},
+							"search": {
+								[]string{
+									"title",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("AuthorID"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"authorId",
+								},
+							},
+							"search": {
+								[]string{
+									"author_id",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateFrom"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateFrom",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_from",
+									"omitempty",
+								},
+							},
+						},
+					},
+					FieldName("PublishedDateTo"): {
+						Tags: map[TagName]*FieldSpecifyTag{
+							"query": {
+								[]string{
+									"publishedDateTo",
+								},
+							},
+							"search": {
+								[]string{
+									"published_date_to",
+									"omitempty",
+								},
+							},
+						},
+					},
+				},
 			},
 			args: args{
 				targetTag: "search",
 			},
 			want: map[string]interface{}{},
 		},
+		//{
+		//	name: "",
+		//	fields: fields{
+		//		object:      test6,
+		//		objectType:  reflect.TypeOf(test6),
+		//		objectValue: reflect.ValueOf(test6),
+		//	},
+		//	args: args{
+		//		targetTag: "search",
+		//	},
+		//	want: map[string]interface{}{},
+		//},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			objectParser := &ObjectParser{
-				object:      tt.fields.object,
-				objectType:  tt.fields.objectType,
-				objectValue: tt.fields.objectValue,
+				object:          tt.fields.object,
+				objectType:      tt.fields.objectType,
+				objectValue:     tt.fields.objectValue,
+				objectFieldTags: tt.fields.objectFieldTags,
 			}
 			if got := objectParser.TagValueMap(tt.args.targetTag); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf(
